@@ -1,0 +1,10 @@
+let
+    Origem = Exchange.Contents("email@dominio.com.br"),
+    Mail1 = Origem{[Name="Mail"]}[Data],
+    #"Outras Colunas Removidas" = Table.SelectColumns(Mail1,{"Folder Path", "DateTimeReceived", "Id"}),
+    #"Linhas Filtradas" = Table.SelectRows(#"Outras Colunas Removidas", each ([Folder Path] = "\Caixa de entrada\")),
+    #"Tipo Alterado" = Table.TransformColumnTypes(#"Linhas Filtradas",{{"DateTimeReceived", type date}}),
+    #"Linhas Agrupadas" = Table.Group(#"Tipo Alterado", {"DateTimeReceived"}, {{"Contagem", each Table.RowCount(_), type number}}),
+    #"Colunas com Nome Mudado" = Table.RenameColumns(#"Linhas Agrupadas",{{"DateTimeReceived", "DateReceived"}, {"Contagem", "EmailsDia"}})
+in
+    #"Colunas com Nome Mudado"
